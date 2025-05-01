@@ -2,6 +2,8 @@ import axios from 'axios';
 import { PexelsResponse, PhotoSearchParams, PexelsError } from '../types/pexels';
 import { DEFAULT_PAGE, ITEMS_PER_PAGE, INTERNAL_SERVER_ERROR, ERROR_MESSAGES } from '../constants/api';
 
+const { DEFAULT_ERROR, UNEXPECTED_ERROR, API_ERROR } = ERROR_MESSAGES;
+
 const API_KEY = process.env.REACT_APP_PEXELS_API_KEY;
 
 const BASE_URL = 'https://api.pexels.com/v1';
@@ -18,38 +20,28 @@ const api = axios.create({
 
 export const searchPhotos = async (params: PhotoSearchParams): Promise<PexelsResponse> => {
   try {
-    const { 
-      query: searchQuery,
-      page: currentPage = DEFAULT_PAGE,
-      per_page: itemsPerPage = ITEMS_PER_PAGE,
-      orientation: photoOrientation,
-      size: photoSize,
-      color: photoColor,
-      locale: languageLocale
-    } = params;
-
     const { data } = await api.get<PexelsResponse>('/search', {
       params: {
-        query: searchQuery,
-        page: currentPage,
-        per_page: itemsPerPage,
-        orientation: photoOrientation,
-        size: photoSize,
-        color: photoColor,
-        locale: languageLocale,
+        query: params.query,
+        page: params.page || DEFAULT_PAGE,
+        per_page: params.per_page || ITEMS_PER_PAGE,
+        orientation: params.orientation,
+        size: params.size,
+        color: params.color,
+        locale: params.locale,
       },
     });
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error(ERROR_MESSAGES.API_ERROR, error.response?.data);
+      console.error(API_ERROR, error.response?.data);
       throw {
-        error: error.response?.data?.error || ERROR_MESSAGES.DEFAULT_ERROR,
+        error: error.response?.data?.error || DEFAULT_ERROR,
         status: error.response?.status || INTERNAL_SERVER_ERROR,
       } as PexelsError;
     }
     throw {
-      error: ERROR_MESSAGES.UNEXPECTED_ERROR,
+      error: UNEXPECTED_ERROR,
       status: INTERNAL_SERVER_ERROR,
     } as PexelsError;
   }
@@ -66,14 +58,14 @@ export const getCuratedPhotos = async (page: number = DEFAULT_PAGE, perPage: num
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error(ERROR_MESSAGES.API_ERROR, error.response?.data);
+      console.error(API_ERROR, error.response?.data);
       throw {
-        error: error.response?.data?.error || ERROR_MESSAGES.DEFAULT_ERROR,
+        error: error.response?.data?.error || DEFAULT_ERROR,
         status: error.response?.status || INTERNAL_SERVER_ERROR,
       } as PexelsError;
     }
     throw {
-      error: ERROR_MESSAGES.UNEXPECTED_ERROR,
+      error: UNEXPECTED_ERROR,
       status: INTERNAL_SERVER_ERROR,
     } as PexelsError;
   }
