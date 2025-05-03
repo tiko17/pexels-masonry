@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PexelsResponse, PhotoSearchParams, PexelsError } from '../types/pexels';
+import { PexelsResponse, PhotoSearchParams, PexelsError, Photo } from '../types/pexels';
 import { DEFAULT_PAGE, ITEMS_PER_PAGE, INTERNAL_SERVER_ERROR, ERROR_MESSAGES } from '../constants/api';
 
 const { DEFAULT_ERROR, UNEXPECTED_ERROR, API_ERROR } = ERROR_MESSAGES;
@@ -17,6 +17,25 @@ const api = axios.create({
   },
   withCredentials: false,
 });
+
+export const getPhotoById = async (id: string): Promise<Photo> => {
+  try {
+    const { data } = await api.get<Photo>(`/photos/${id}`);
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error(API_ERROR, error.response?.data);
+      throw {
+        error: error.response?.data?.error || DEFAULT_ERROR,
+        status: error.response?.status || INTERNAL_SERVER_ERROR,
+      } as PexelsError;
+    }
+    throw {
+      error: UNEXPECTED_ERROR,
+      status: INTERNAL_SERVER_ERROR,
+    } as PexelsError;
+  }
+};
 
 export const searchPhotos = async (params: PhotoSearchParams): Promise<PexelsResponse> => {
   try {
