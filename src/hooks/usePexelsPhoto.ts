@@ -6,21 +6,13 @@ interface UsePexelsPhotoResult {
   photo: Photo | null;
   loading: boolean;
   error: string | null;
-  imageLoaded: boolean;
-  setImageLoaded: (loaded: boolean) => void;
 }
 
 export const usePexelsPhoto = (id: string | undefined): UsePexelsPhotoResult => {
-  const [state, setState] = useState<{
-    photo: Photo | null;
-    loading: boolean;
-    error: string | null;
-    imageLoaded: boolean;
-  }>({
+  const [state, setState] = useState<UsePexelsPhotoResult>({
     photo: null,
-    loading: true,
+    loading: Boolean(id),
     error: null,
-    imageLoaded: false,
   });
 
   useEffect(() => {
@@ -40,9 +32,12 @@ export const usePexelsPhoto = (id: string | undefined): UsePexelsPhotoResult => 
           setState(prev => ({ 
             ...prev, 
             photo,
-            loading: false,
-            imageLoaded: false // Reset image loaded state for new photo
+            loading: false
           }));
+
+          // Preload the large version
+          const img = new Image();
+          img.src = photo.src.large;
         }
       } catch (err) {
         if (mounted) {
@@ -62,12 +57,5 @@ export const usePexelsPhoto = (id: string | undefined): UsePexelsPhotoResult => 
     };
   }, [id]);
 
-  const setImageLoaded = (loaded: boolean) => {
-    setState(prev => ({ ...prev, imageLoaded: loaded }));
-  };
-
-  return {
-    ...state,
-    setImageLoaded
-  };
+  return state;
 }; 
