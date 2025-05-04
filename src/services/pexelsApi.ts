@@ -5,8 +5,15 @@ import { DEFAULT_PAGE, ITEMS_PER_PAGE, INTERNAL_SERVER_ERROR, ERROR_MESSAGES } f
 const { DEFAULT_ERROR, UNEXPECTED_ERROR, API_ERROR } = ERROR_MESSAGES;
 
 const API_KEY = process.env.REACT_APP_PEXELS_API_KEY;
-
 const BASE_URL = 'https://api.pexels.com/v1';
+
+// Cache implementation
+const cache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const isCacheValid = (timestamp: number) => {
+  return Date.now() - timestamp < CACHE_DURATION;
+};
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -19,8 +26,16 @@ const api = axios.create({
 });
 
 export const getPhotoById = async (id: string): Promise<Photo> => {
+  const cacheKey = `photo_${id}`;
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData && isCacheValid(cachedData.timestamp)) {
+    return cachedData.data;
+  }
+
   try {
     const { data } = await api.get<Photo>(`/photos/${id}`);
+    cache.set(cacheKey, { data, timestamp: Date.now() });
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -38,6 +53,13 @@ export const getPhotoById = async (id: string): Promise<Photo> => {
 };
 
 export const searchPhotos = async (params: PhotoSearchParams): Promise<PexelsResponse> => {
+  const cacheKey = `search_${JSON.stringify(params)}`;
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData && isCacheValid(cachedData.timestamp)) {
+    return cachedData.data;
+  }
+
   try {
     const { data } = await api.get<PexelsResponse>('/search', {
       params: {
@@ -50,6 +72,7 @@ export const searchPhotos = async (params: PhotoSearchParams): Promise<PexelsRes
         locale: params.locale,
       },
     });
+    cache.set(cacheKey, { data, timestamp: Date.now() });
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -67,6 +90,13 @@ export const searchPhotos = async (params: PhotoSearchParams): Promise<PexelsRes
 };
 
 export const getCuratedPhotos = async (page: number = DEFAULT_PAGE, perPage: number = ITEMS_PER_PAGE): Promise<PexelsResponse> => {
+  const cacheKey = `curated_${page}_${perPage}`;
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData && isCacheValid(cachedData.timestamp)) {
+    return cachedData.data;
+  }
+
   try {
     const { data } = await api.get<PexelsResponse>('/curated', {
       params: {
@@ -74,6 +104,7 @@ export const getCuratedPhotos = async (page: number = DEFAULT_PAGE, perPage: num
         per_page: perPage,
       },
     });
+    cache.set(cacheKey, { data, timestamp: Date.now() });
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
