@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Photo, PexelsResponse } from '../types/pexels';
+import { Photo } from '../types/pexels';
 import { getCuratedPhotos } from '../services/pexelsApi';
+
+interface UsePexelsPhotosState {
+  photos: Photo[];
+  loading: boolean;
+  error: string | null;
+  page: number;
+}
 
 interface UsePexelsPhotosResult {
   photos: Photo[];
@@ -10,10 +17,13 @@ interface UsePexelsPhotosResult {
 }
 
 export const usePexelsPhotos = (): UsePexelsPhotosResult => {
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
+  const [state, setState] = useState<UsePexelsPhotosState>({
+    photos: [],
+    loading: false,
+    error: null,
+    page: 1
+  });
+
   const isInitialMount = useRef(true);
   const loadingRef = useRef(false);
 
@@ -23,30 +33,30 @@ export const usePexelsPhotos = (): UsePexelsPhotosResult => {
     }
 
     try {
-      setLoading(true);
       loadingRef.current = true;
-      setError(null);
+      setState(prev => ({ ...prev, loading: true, error: null }));
 
-      const currentPage = isLoadMore ? page : 1;
+      const currentPage = isLoadMore ? state.page : 1;
       const response = await getCuratedPhotos(currentPage, 30);
 
-      setPhotos(prev => {
-        if (isLoadMore) {
-          const existingIds = new Set(prev.map(p => p.id));
-          const newPhotos = response.photos.filter(p => !existingIds.has(p.id));
-          return [...prev, ...newPhotos];
-        }
-        return response.photos;
-      });
-      
-      setPage(currentPage + 1);
+      setState(prev => ({
+        photos: isLoadMore 
+          ? [...filterDuplicatePhotos(prev.photos, response.photos)]
+          : response.photos,
+        loading: false,
+        error: null,
+        page: currentPage + 1
+      }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch photos');
+      setState(prev => ({
+        ...prev,
+        error: err instanceof Error ? err.message : 'Failed to fetch photos',
+        loading: false
+      }));
     } finally {
-      setLoading(false);
       loadingRef.current = false;
     }
-  }, [page]);
+  }, [state.page]);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -56,15 +66,22 @@ export const usePexelsPhotos = (): UsePexelsPhotosResult => {
   }, [fetchPhotos]);
 
   const loadMore = useCallback(async () => {
-    if (!loading) {
+    if (!state.loading) {
       await fetchPhotos(true);
     }
-  }, [fetchPhotos, loading]);
+  }, [fetchPhotos, state.loading]);
 
   return {
-    photos,
-    loading,
-    error,
-    loadMore,
+    photos: state.photos,
+    loading: state.loading,
+    error: state.error,
+    loadMore
   };
+};
+
+// Helper function to filter out duplicate photos when loading more
+const filterDuplicatePhotos = (existingPhotos: Photo[], newPhotos: Photo[]): Photo[] => {
+  const existingIds = new Set(existingPhotos.map(p => p.id));
+  const uniqueNewPhotos = newPhotos.filter(p => !existingIds.has(p.id));
+  return [...existingPhotos, ...uniqueNewPhotos];
 }; 
