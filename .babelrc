@@ -1,0 +1,15 @@
+{
+  "plugins": [
+    [
+      "babel-plugin-styled-components",
+      {
+        "displayName": true,
+        "fileName": false,
+        "meaninglessFileNames": ["index", "styles"],
+        "pure": true,
+        "ssr": true,
+        "namespace": "pexels-masonry"
+      }
+    ]
+  ]
+} 
