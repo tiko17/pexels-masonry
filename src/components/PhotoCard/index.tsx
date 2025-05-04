@@ -3,9 +3,6 @@ import { Photo } from '../../types/pexels';
 import { Card, ImageContainer, PhotoImage, PhotoInfo } from './styled';
 import { CardVariant, CardElevation, ImageFit } from './styled/types';
 
-// Function to filter styled-component props
-const shouldForwardProp = (prop: string) => !prop.startsWith('$');
-
 interface PhotoCardProps {
   photo: Photo;
   onClick: () => void;
