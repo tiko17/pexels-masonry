@@ -1,4 +1,5 @@
 import { Theme } from '../../../styles/theme';
+import { ImgHTMLAttributes } from 'react';
 
 export interface BaseStyledProps {
   readonly className?: string;
@@ -15,8 +16,9 @@ export interface PhotoContainerProps extends BaseStyledProps {
   $maxHeight?: string;
 }
 
-export interface PhotoImageProps extends BaseStyledProps {
-  $loaded?: boolean;
+export interface PhotoImageProps extends ImgHTMLAttributes<HTMLImageElement> {
+  $loaded: boolean;
+  theme?: Theme;
 }
 
 export interface PhotoInfoProps extends BaseStyledProps {

@@ -1,89 +1,80 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
 import { usePexelsPhoto } from '../../hooks/usePexelsPhoto';
-import { theme } from '../../styles';
-import LoadingState from '../../components/LoadingState';
 import {
-  PhotoDetailsContainer,
-  PhotoContainer,
-  PhotoInfo,
+  Container,
   BackButton,
-  PhotoImage,
-  PhotographerInfo,
-  PhotoTitle,
   ErrorMessage,
-  LoadingPlaceholder
+  ImageContainer,
+  Image,
+  PhotoTitle,
+  PhotoMeta,
+  PhotographerLink
 } from './styled';
 
-/**
- * Component for displaying detailed information about a photo.
- * 
- * @component
- * @example
- * ```tsx
- * <PhotoDetails />
- * ```
- */
-const PhotoDetails: React.FC = () => {
+const PhotoDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { photo, loading, error, imageLoaded, setImageLoaded } = usePexelsPhoto(id);
-
-  const handleBack = () => {
-    navigate(-1);
-  };
+  const { photo, error, loading } = usePexelsPhoto(id);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <ThemeProvider theme={theme}>
-      <PhotoDetailsContainer>
-        <BackButton onClick={handleBack}>← Back</BackButton>
-        
-        {error ? (
-          <ErrorMessage>{error}</ErrorMessage>
-        ) : (
-          <>
-            <PhotoContainer 
-              $aspectRatio={photo ? `${photo.width}/${photo.height}` : undefined}
-              $maxHeight="80vh"
-            >
-              {!imageLoaded && (loading || !photo) && (
-                <LoadingPlaceholder>
-                  <LoadingState />
-                </LoadingPlaceholder>
+    <Container>
+      <BackButton onClick={() => navigate(-1)}>
+        ← Back
+      </BackButton>
+      
+      {error ? (
+        <ErrorMessage>{error}</ErrorMessage>
+      ) : loading ? (
+        <ImageContainer $aspectRatio="16/9">
+          <div>Loading...</div>
+        </ImageContainer>
+      ) : photo && (
+        <>
+          <ImageContainer $aspectRatio={`${photo.width}/${photo.height}`}>
+            <picture>
+              {/* Show a smaller image first for faster initial load */}
+              <source
+                srcSet={photo.src.medium}
+                media="(max-width: 768px)"
+                type="image/jpeg"
+              />
+              <source
+                srcSet={photo.src.large}
+                media="(min-width: 769px)"
+                type="image/jpeg"
+              />
+              <Image 
+                src={photo.src.medium}
+                alt={photo.alt || 'Photo'}
+                onLoad={() => setImageLoaded(true)}
+                className={imageLoaded ? 'loaded' : ''}
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
+          </ImageContainer>
+          <div>
+            <PhotoTitle>
+              {photo.alt || 'Untitled Photo'}
+            </PhotoTitle>
+            <PhotoMeta>
+              Photographer: {photo.photographer}
+              {photo.photographer_url && (
+                <PhotographerLink 
+                  href={photo.photographer_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {' '}(View Profile)
+                </PhotographerLink>
               )}
-              {photo && (
-                <PhotoImage
-                  src={photo.src.original}
-                  alt={photo.alt || 'Photo'}
-                  onLoad={() => setImageLoaded(true)}
-                  $loaded={imageLoaded}
-                  loading="lazy"
-                />
-              )}
-            </PhotoContainer>
-
-            {photo && (
-              <PhotoInfo>
-                <PhotoTitle>{photo.alt || 'Untitled Photo'}</PhotoTitle>
-                <PhotographerInfo>
-                  Photographer: {photo.photographer}
-                  {photo.photographer_url && (
-                    <a 
-                      href={photo.photographer_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                    >
-                      {' '}(View Profile)
-                    </a>
-                  )}
-                </PhotographerInfo>
-              </PhotoInfo>
-            )}
-          </>
-        )}
-      </PhotoDetailsContainer>
-    </ThemeProvider>
+            </PhotoMeta>
+          </div>
+        </>
+      )}
+    </Container>
   );
 };
 
