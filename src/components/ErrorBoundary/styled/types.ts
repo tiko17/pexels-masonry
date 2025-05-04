@@ -1,5 +1,10 @@
 import { ReactNode } from 'react';
-import { BaseStyledProps } from './theme';
+import { DefaultTheme } from 'styled-components';
+
+export interface BaseStyledProps {
+  theme?: DefaultTheme;
+  className?: string;
+}
 
 export interface ErrorBoundaryProps {
   children: ReactNode;
