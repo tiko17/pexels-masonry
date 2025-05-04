@@ -31,18 +31,20 @@ const variants = {
  * @component
  * @example
  * ```tsx
- * <Card $variant="featured" $elevation="raised">
+ * <Card $variant="featured" $elevation="raised" $isLoaded={true} $isHovered={false}>
  *   {children}
  * </Card>
  * ```
  */
-export const Card = styled.div<CardProps>`
+export const Card = styled.div<CardProps & { $isLoaded: boolean; $isHovered: boolean }>`
   overflow: hidden;
   background: white;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s ease-in-out;
   border-radius: ${({ $borderRadius }) => $borderRadius || 'inherit'};
   box-shadow: ${({ $elevation = 'default' }) => elevations[$elevation].boxShadow};
+  opacity: ${({ $isLoaded }) => ($isLoaded ? 1 : 0)};
+  transform: ${({ $isHovered }) => ($isHovered ? 'scale(1.02)' : 'scale(1)')};
 
   ${({ $variant = 'default' }) => variants[$variant]}
 

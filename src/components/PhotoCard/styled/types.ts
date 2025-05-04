@@ -2,7 +2,7 @@ import { Theme } from '../../../styles/theme';
 
 export type CardVariant = 'default' | 'compact' | 'featured';
 export type CardElevation = 'default' | 'raised';
-export type ImageFit = 'cover' | 'contain';
+export type ImageFit = 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
 
 export interface BaseStyledProps {
   readonly className?: string;
@@ -13,6 +13,8 @@ export interface CardProps extends BaseStyledProps {
   $variant?: CardVariant;
   $elevation?: CardElevation;
   $borderRadius?: string;
+  $isLoaded?: boolean;
+  $isHovered?: boolean;
 }
 
 export interface ImageContainerProps extends BaseStyledProps {
@@ -21,7 +23,6 @@ export interface ImageContainerProps extends BaseStyledProps {
 
 export interface PhotoImageProps extends BaseStyledProps {
   $objectFit?: ImageFit;
-  $loaded?: boolean;
 }
 
 export interface PhotoInfoProps extends BaseStyledProps {

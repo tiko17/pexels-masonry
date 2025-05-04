@@ -1,9 +1,10 @@
-import React, { useRef, useEffect } from 'react';
-import { ThemeProvider } from 'styled-components';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Photo } from '../../types/pexels';
-import { theme } from '../../styles';
 import { Card, ImageContainer, PhotoImage, PhotoInfo } from './styled';
 import { CardVariant, CardElevation, ImageFit } from './styled/types';
+
+// Function to filter styled-component props
+const shouldForwardProp = (prop: string) => !prop.startsWith('$');
 
 interface PhotoCardProps {
   photo: Photo;
@@ -31,6 +32,8 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
   isVisible = true,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (cardRef.current && onLoad) {
@@ -44,30 +47,60 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
     }
   }, [onLoad]);
 
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+    // Preload the next image size
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.as = 'image';
+    link.href = photo.src.large;
+    document.head.appendChild(link);
+  }, [photo.src.large]);
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    if (onLoad && cardRef.current) {
+      onLoad(cardRef.current.offsetHeight);
+    }
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <Card
-        ref={cardRef}
-        onClick={onClick}
-        $variant={variant}
-        $elevation={elevation}
-        $borderRadius={borderRadius}
-      >
-        <ImageContainer $aspectRatio={`${photo.width}/${photo.height}`}>
-          {isVisible && (
+    <Card
+      ref={cardRef}
+      onClick={onClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setIsHovered(false)}
+      $variant={variant}
+      $elevation={elevation}
+      $borderRadius={borderRadius}
+      $isLoaded={imageLoaded}
+      $isHovered={isHovered}
+    >
+      <ImageContainer $aspectRatio={`${photo.width}/${photo.height}`}>
+        {isVisible && (
+          <picture>
+            <source
+              srcSet={photo.src.large}
+              media="(min-width: 1200px)"
+              type="image/jpeg"
+            />
             <PhotoImage
-              src={photo.src.large}
+              src={photo.src.medium}
               alt={photo.alt}
               loading="lazy"
+              onLoad={handleImageLoad}
               $objectFit={objectFit}
+              width={photo.width}
+              height={photo.height}
+              decoding="async"
             />
-          )}
-        </ImageContainer>
-        <PhotoInfo $padding={infoPadding} $fontSize={infoFontSize}>
-          <span>{photo.photographer}</span>
-        </PhotoInfo>
-      </Card>
-    </ThemeProvider>
+          </picture>
+        )}
+      </ImageContainer>
+      <PhotoInfo $padding={infoPadding} $fontSize={infoFontSize}>
+        <span>{photo.photographer}</span>
+      </PhotoInfo>
+    </Card>
   );
 };
 

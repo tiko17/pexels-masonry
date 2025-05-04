@@ -8,18 +8,17 @@ import { ImageContainerProps } from '../types';
  * @component
  * @example
  * ```tsx
- * <ImageContainer style={{ aspectRatio: '16/9' }}>
+ * <ImageContainer $aspectRatio="16/9">
  *   {children}
  * </ImageContainer>
  * ```
  */
-export const ImageContainer = styled.div.attrs<ImageContainerProps>(({ 
-  $aspectRatio
-}) => ({
-  style: {
-    aspectRatio: $aspectRatio
-  }
-}))`
+export const ImageContainer = styled.div<ImageContainerProps>`
   width: 100%;
   position: relative;
+  aspect-ratio: ${({ $aspectRatio }) => $aspectRatio};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 `; 
