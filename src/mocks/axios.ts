@@ -1,4 +1,4 @@
-import { AxiosInstance, AxiosResponse } from 'axios';
+import { AxiosInstance } from 'axios';
 
 interface MockAxios extends AxiosInstance {
   create: jest.Mock;
@@ -7,6 +7,7 @@ interface MockAxios extends AxiosInstance {
   put: jest.Mock;
   delete: jest.Mock;
   request: jest.Mock;
+  isAxiosError: jest.Mock;
 }
 
 const mockAxios: MockAxios = {
@@ -16,6 +17,7 @@ const mockAxios: MockAxios = {
   put: jest.fn(),
   delete: jest.fn(),
   request: jest.fn(),
+  isAxiosError: jest.fn(),
   defaults: {
     headers: {
       common: {}

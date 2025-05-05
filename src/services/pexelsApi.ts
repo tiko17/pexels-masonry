@@ -8,7 +8,7 @@ const API_KEY = process.env.REACT_APP_PEXELS_API_KEY;
 const BASE_URL = 'https://api.pexels.com/v1';
 
 // Cache implementation
-const cache = new Map<string, { data: any; timestamp: number }>();
+export const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 const isCacheValid = (timestamp: number) => {
