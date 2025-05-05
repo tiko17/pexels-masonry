@@ -6,25 +6,11 @@ import { SearchContainer, SearchInput, SearchButton } from './styled';
 interface SearchBarProps {
   onSearch: (query: string) => void;
   initialValue?: string;
-  maxWidth?: string;
-  gap?: string;
-  inputFontSize?: string;
-  inputPadding?: string;
-  buttonMinWidth?: string;
-  buttonFontSize?: string;
-  buttonPadding?: string;
 }
 
 const SearchBar: React.FC<SearchBarProps> = memo(({
   onSearch,
   initialValue = '',
-  maxWidth,
-  gap,
-  inputFontSize,
-  inputPadding,
-  buttonMinWidth,
-  buttonFontSize,
-  buttonPadding,
 }) => {
   const [query, setQuery] = useState(initialValue);
 
@@ -53,23 +39,18 @@ const SearchBar: React.FC<SearchBarProps> = memo(({
 
   return (
     <ThemeProvider theme={theme}>
-      <SearchContainer onSubmit={handleSubmit} maxWidth={maxWidth} gap={gap}>
+      <SearchContainer onSubmit={handleSubmit}>
         <SearchInput
           type="text"
           placeholder="Search for photos..."
           value={query}
           onChange={handleChange}
           aria-label="Search photos"
-          fontSize={inputFontSize}
-          padding={inputPadding}
         />
         <SearchButton 
           type="submit"
           disabled={!query.trim()}
           aria-label="Submit search"
-          minWidth={buttonMinWidth}
-          fontSize={buttonFontSize}
-          padding={buttonPadding}
         >
           Search
         </SearchButton>

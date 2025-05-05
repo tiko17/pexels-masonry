@@ -12,10 +12,10 @@ import { SearchInputProps } from '../types';
  */
 export const SearchInput = styled.input<SearchInputProps>`
   flex: 1;
-  padding: ${({ padding = '1rem 1.5rem' }) => padding};
+  padding: 0.75rem 1rem;
   border: 2px solid ${({ theme }) => `${theme.colors.text.secondary}20`};
   border-radius: 12px;
-  font-size: ${({ fontSize = '1.125rem' }) => fontSize};
+  font-size: 1rem;
   outline: none;
   transition: all 0.2s ease-in-out;
   background: white;

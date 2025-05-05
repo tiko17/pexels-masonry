@@ -29,16 +29,16 @@ const buttonStates = {
  * ```
  */
 export const SearchButton = styled.button<SearchButtonProps>`
-  padding: ${({ padding = '1rem 2rem' }) => padding};
+  padding: 0.75rem 1.5rem;
   background: ${({ theme }) => theme.colors.text.primary};
   color: white;
   border: none;
   border-radius: 12px;
-  font-size: ${({ fontSize = '1.125rem' }) => fontSize};
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  min-width: ${({ minWidth = '120px' }) => minWidth};
+  min-width: 100px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   &:hover:not(:disabled) {
@@ -55,7 +55,6 @@ export const SearchButton = styled.button<SearchButtonProps>`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     padding: 0.75rem 1rem;
-    font-size: 1rem;
     min-width: 90px;
     border-radius: 8px;
   }
