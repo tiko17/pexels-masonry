@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { Photo } from '../../types/pexels';
-import { usePexelsPhotos } from '../../hooks/usePexelsPhotos';
+import { useSearchPhotos } from '../../hooks/useSearchPhotos';
 import { useGridCalculations } from '../../hooks/useGridCalculations';
 import { useScrollHandler } from '../../hooks/useScrollHandler';
 import { useVirtualization } from '../../hooks/useVirtualization';
@@ -20,12 +20,16 @@ import LoadingState from '../LoadingState';
 
 const MemoizedPhotoCard = memo(PhotoCard);
 
-const MasonryGrid: React.FC = () => {
+interface MasonryGridProps {
+  searchQuery?: string;
+}
+
+const MasonryGrid: React.FC<MasonryGridProps> = ({ searchQuery = '' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerHeight, setContainerHeight] = useState(0);
   const navigate = useNavigate();
   
-  const { photos, loading, error, loadMore } = usePexelsPhotos();
+  const { photos, loading, error, loadMore } = useSearchPhotos(searchQuery);
 
   const {
     columns,
