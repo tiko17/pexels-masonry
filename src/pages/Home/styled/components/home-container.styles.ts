@@ -14,19 +14,7 @@ import { GRID } from '../../../../styles/constants';
  * </HomeContainer>
  * ```
  */
-export const HomeContainer = styled.div.attrs<HomeContainerProps>(({ 
-  maxWidth = GRID.maxContentWidth,
-  minHeight = '100vh',
-  backgroundColor = 'white',
-  theme
-}) => ({
-  style: {
-    maxWidth,
-    minHeight,
-    backgroundColor,
-    padding: theme?.spacing?.lg
-  }
-}))`
+export const HomeContainer = styled.div<HomeContainerProps>`
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
@@ -34,16 +22,20 @@ export const HomeContainer = styled.div.attrs<HomeContainerProps>(({
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  max-width: ${GRID.maxContentWidth};
+  min-height: 100vh;
+  background-color: white;
+  padding: ${({ theme }) => `${theme?.spacing?.sm} ${theme?.spacing?.xs}`};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     && {
-      padding: ${({ theme }) => theme.spacing.md};
+      padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.xs}`};
     }
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     && {
-      padding: ${({ theme }) => theme.spacing.sm};
+      padding: ${({ theme }) => `${theme.spacing.xs} ${theme.spacing.xs}`};
     }
   }
-`; 
+`;
